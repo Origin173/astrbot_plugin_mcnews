@@ -1,6 +1,6 @@
 name: astrbot_plugin_mcnews
 display_name: Minecraft 资讯播报
 desc: 自动推送 Minecraft 最新资讯、版本更新与服务状态的 AstrBot 插件。支持官方文章、版本更新（包含快照）和 Mojang 服务状态监控，支持白名单配置。
-version: v1.1.0
+version: v1.0.0
 author: Origin173
 repo: https://github.com/Origin173/astrbot_plugin_mcnews
