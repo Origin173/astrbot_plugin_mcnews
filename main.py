@@ -131,42 +131,40 @@ class Main(star.Star):
             return
 
         versions = version_data.get("versions", [])
-        notified = self.storage.get_notified_versions()
+        if not versions:
+            return
+
+        latest_version = versions[0]
+        latest_id = latest_version.get("id", "")
+        latest_type = latest_version.get("type", "")
+
+        last_notified = self.storage.get_last_notified_version()
         notify_snapshot = self.config.get("notify_snapshot", True)
 
-        new_version = None
+        if latest_id == last_notified:
+            return
 
-        for version in versions[:20]:
-            version_id = version.get("id", "")
-            version_type = version.get("type", "")
+        if latest_type == "snapshot" and not notify_snapshot:
+            self.storage.set_last_notified_version(latest_id)
+            self.storage.save()
+            return
 
-            if version_id in notified:
-                continue
+        mc_version = MCVersion(
+            id=latest_id,
+            type=latest_type,
+            url=latest_version.get("url", ""),
+            time=latest_version.get("time", ""),
+            release_time=latest_version.get("releaseTime", "")
+        )
 
-            if version_type == "snapshot" and not notify_snapshot:
-                self.storage.add_notified_version(version_id)
-                continue
-
-            if version_type in ["release", "snapshot"]:
-                mc_version = MCVersion(
-                    id=version_id,
-                    type=version_type,
-                    url=version.get("url", ""),
-                    time=version.get("time", ""),
-                    release_time=version.get("releaseTime", "")
-                )
-                self.storage.add_notified_version(version_id)
-                new_version = mc_version
-                break
-
+        self.storage.set_last_notified_version(latest_id)
         self.storage.save()
 
-        if new_version:
-            content = await MCNewsFetcher.fetch_article_content(new_version.article_url)
-            new_version.content = content
-            message = MCNewsFormatter.format_version_push(new_version)
-            await self._send_to_whitelist(message)
-            logger.info(f"MCNews: Pushed version: {new_version.id}")
+        content = await MCNewsFetcher.fetch_article_content(mc_version.article_url)
+        mc_version.content = content
+        message = MCNewsFormatter.format_version_push(mc_version)
+        await self._send_to_whitelist(message)
+        logger.info(f"MCNews: Pushed version: {mc_version.id}")
 
     @filter.command_group("mcnews", description="Minecraft Java版本更新与Mojang服务状态监控")
     def mcnews(self):

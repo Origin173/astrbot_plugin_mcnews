@@ -5,6 +5,7 @@ import re
 
 @dataclass
 class MCVersionContent:
+    new_features: List[str] = field(default_factory=list)
     changes: List[str] = field(default_factory=list)
     bug_fixes: List[str] = field(default_factory=list)
     technical_changes: List[str] = field(default_factory=list)

@@ -51,6 +51,12 @@ class DataStorage:
             notified.append(version_id)
         self.data["notified_versions"] = notified[-100:]
 
+    def get_last_notified_version(self) -> str:
+        return self.data.get("last_version_id", "")
+
+    def set_last_notified_version(self, version_id: str):
+        self.data["last_version_id"] = version_id
+
     def get_last_services_status(self) -> Dict[str, str]:
         return self.data.get("last_services_status", {})
 

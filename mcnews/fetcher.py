@@ -47,49 +47,65 @@ class MCNewsFetcher:
             return MCVersionContent()
 
     @staticmethod
-    def _parse_article_html(html: str) -> MCVersionContent:
+    def _clean_text(text: str) -> str:
+        import html as html_module
+        text = re.sub(r'<[^>]+>', '', text).strip()
+        text = re.sub(r'\s+', ' ', text)
+        text = html_module.unescape(text)
+        return text
+
+    @staticmethod
+    def _parse_article_html(html_content: str) -> MCVersionContent:
         content = MCVersionContent()
         
+        features_match = re.search(
+            r'<h2[^>]*>New Features</h2>(.*?)(?=<h2)',
+            html_content, re.DOTALL
+        )
+        if features_match:
+            items = re.findall(r'<li[^>]*>(.*?)</li>', features_match.group(1), re.DOTALL)
+            for item in items[:10]:
+                text = MCNewsFetcher._clean_text(item)
+                if text and len(text) > 3:
+                    content.new_features.append(text)
+
         changes_match = re.search(
             r'<h2[^>]*>Changes</h2>(.*?)(?=<h2)',
-            html, re.DOTALL
+            html_content, re.DOTALL
         )
         if changes_match:
             items = re.findall(r'<li[^>]*>(.*?)</li>', changes_match.group(1), re.DOTALL)
-            for item in items[:8]:
-                text = re.sub(r'<[^>]+>', '', item).strip()
-                text = re.sub(r'\s+', ' ', text)
+            for item in items[:10]:
+                text = MCNewsFetcher._clean_text(item)
                 if text and len(text) > 3:
-                    content.changes.append(text[:100])
+                    content.changes.append(text)
 
         bugs_match = re.search(
             r'<h2[^>]*>Fixed bugs[^<]*</h2>(.*?)(?=<h2)',
-            html, re.DOTALL | re.IGNORECASE
+            html_content, re.DOTALL | re.IGNORECASE
         )
         if bugs_match:
             items = re.findall(r'<li[^>]*>(.*?)</li>', bugs_match.group(1), re.DOTALL)
-            for item in items[:6]:
-                text = re.sub(r'<[^>]+>', '', item).strip()
-                text = re.sub(r'\s+', ' ', text)
+            for item in items[:15]:
+                text = MCNewsFetcher._clean_text(item)
                 mc_match = re.search(r'(MC-\d+)', text)
                 if mc_match:
                     bug_id = mc_match.group(1)
                     desc = text.split(' - ', 1)[-1] if ' - ' in text else text
-                    content.bug_fixes.append(f"{bug_id}: {desc[:80]}")
+                    content.bug_fixes.append(f"{bug_id}: {desc}")
                 elif text and len(text) > 3:
-                    content.bug_fixes.append(text[:80])
+                    content.bug_fixes.append(text)
 
         tech_match = re.search(
             r'<h2[^>]*>Technical Changes</h2>(.*?)(?=<h2)',
-            html, re.DOTALL
+            html_content, re.DOTALL
         )
         if tech_match:
             items = re.findall(r'<li[^>]*>(.*?)</li>', tech_match.group(1), re.DOTALL)
-            for item in items[:4]:
-                text = re.sub(r'<[^>]+>', '', item).strip()
-                text = re.sub(r'\s+', ' ', text)
+            for item in items[:5]:
+                text = MCNewsFetcher._clean_text(item)
                 if text and len(text) > 3:
-                    content.technical_changes.append(text[:100])
+                    content.technical_changes.append(text)
 
         return content
 

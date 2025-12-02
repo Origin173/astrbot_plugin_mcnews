@@ -15,22 +15,28 @@ class MCNewsFormatter:
         ]
         
         if version.content:
+            if version.content.new_features:
+                lines.append("")
+                lines.append("[新特性]")
+                for feature in version.content.new_features:
+                    lines.append(f"- {feature}")
+
             if version.content.changes:
                 lines.append("")
                 lines.append("[更新内容]")
-                for change in version.content.changes[:5]:
+                for change in version.content.changes:
                     lines.append(f"- {change}")
             
             if version.content.bug_fixes:
                 lines.append("")
                 lines.append("[漏洞修复]")
-                for bug in version.content.bug_fixes[:5]:
+                for bug in version.content.bug_fixes:
                     lines.append(f"- {bug}")
             
             if version.content.technical_changes:
                 lines.append("")
                 lines.append("[技术性更改]")
-                for tech in version.content.technical_changes[:3]:
+                for tech in version.content.technical_changes:
                     lines.append(f"- {tech}")
         
         lines.append("")
