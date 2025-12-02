@@ -1,0 +1,38 @@
+{
+  "whitelist": {
+    "description": "推送白名单",
+    "type": "list",
+    "hint": "只向白名单内的会话发送推送消息。使用 /mcnews add 添加当前会话。",
+    "default": []
+  },
+  "version_check_interval": {
+    "description": "版本检查间隔(分钟)",
+    "type": "int",
+    "hint": "检查 Minecraft Java 版本更新的时间间隔",
+    "default": 15
+  },
+  "service_check_interval": {
+    "description": "服务状态检查间隔(分钟)",
+    "type": "int",
+    "hint": "检查 Mojang 服务状态的时间间隔",
+    "default": 5
+  },
+  "notify_versions": {
+    "description": "推送版本更新",
+    "type": "bool",
+    "hint": "是否推送 Java 版本更新(release/snapshot/pre-release)",
+    "default": true
+  },
+  "notify_snapshot": {
+    "description": "推送快照版本",
+    "type": "bool",
+    "hint": "是否推送快照版本更新(snapshot/pre-release)",
+    "default": true
+  },
+  "notify_service_status": {
+    "description": "推送服务状态变化",
+    "type": "bool",
+    "hint": "当 Mojang 服务状态发生变化时推送通知",
+    "default": true
+  }
+}
